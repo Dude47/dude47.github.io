@@ -202,6 +202,90 @@
             width: 60%;
             word-break: break-word;
         }
+
+        .rich-presence-link {
+            display: block;
+            width: 100%;
+            margin-bottom: 2rem;
+            text-decoration: none;
+            color: inherit;
+            border-radius: 16px;
+            transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .rich-presence-link:hover { transform: translateY(-2px); }
+        .rich-presence-card {
+            background: var(--color-surface);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: var(--shadow-item);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        .rp-thumbnail {
+            flex-shrink: 0;
+            width: 76px;
+            height: 76px;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #0f0f0f;
+        }
+        .rp-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .rp-details {
+            flex: 1;
+            min-width: 0;
+        }
+        .rp-title {
+            font-weight: 800;
+            font-size: 1rem;
+            margin: 0 0 3px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--color-primary);
+        }
+        .rp-author {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 0 0 10px 0;
+            opacity: 0.75;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .rp-progress-area { margin-top: 4px; width: 100%; }
+        .rp-progress-bar {
+            background: rgba(31, 54, 92, 0.12);
+            border-radius: 20px;
+            height: 6px;
+            width: 100%;
+            overflow: hidden;
+        }
+        .rp-progress-fill {
+            background: var(--color-primary);
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.1s linear;
+        }
+        .rp-time-stamps {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 6px;
+            opacity: 0.7;
+        }
+        @media (max-width: 550px) {
+            .rp-thumbnail { width: 60px; height: 60px; }
+            .rp-title { font-size: 0.9rem; white-space: normal; }
+            .rp-author { font-size: 0.7rem; }
+        }
     </style>
 
     <script type="application/ld+json">
@@ -247,6 +331,31 @@
             <h2 class="profile-name">Artur Stoliarov</h2>
             <p class="profile-bio">Gamer and minimalist with obsessive perfectionism.</p>
         </header>
+
+        <a class="rich-presence-link" href="https://www.youtube.com/watch?v=haIPsHVN4_Q" target="_blank" rel="noopener noreferrer">
+            <div class="rich-presence-card">
+                <div class="rp-thumbnail">
+                    <img src="https://img.youtube.com/vi/haIPsHVN4_Q/mqdefault.jpg" alt="Thumbnail" width="76" height="76">
+                </div>
+                <div class="rp-details">
+                    <h3 class="rp-title">The Man who Freed the World</h3>
+                    <div class="rp-author">
+                        <span>by Komegatze</span>
+                        <span>•</span>
+                        <span>4.2K watching</span>
+                    </div>
+                    <div class="rp-progress-area">
+                        <div class="rp-progress-bar">
+                            <div class="rp-progress-fill" id="rpProgressFill"></div>
+                        </div>
+                        <div class="rp-time-stamps">
+                            <span id="rpCurrentTime">0:00</span>
+                            <span id="rpTotalTime">0:40</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
 
         <nav class="social-nav" aria-label="Social media profiles">
             <!-- Telegram -->
@@ -371,5 +480,40 @@
         </ul>
 
     </main>
+
+    <script>
+    (function() {
+        const total = 40;
+        const fill = document.getElementById('rpProgressFill');
+        const curSpan = document.getElementById('rpCurrentTime');
+        const totalSpan = document.getElementById('rpTotalTime');
+        if (totalSpan) totalSpan.textContent = '0:40';
+        if (!fill || !curSpan) return;
+
+        const fmt = s => Math.floor(s/60) + ':' + (Math.floor(s%60) < 10 ? '0' + Math.floor(s%60) : Math.floor(s%60));
+        let current = Math.random() * total;
+        let last = null;
+
+        const update = t => {
+            fill.style.width = (t / total * 100) + '%';
+            curSpan.textContent = fmt(t);
+        };
+        update(current);
+
+        const step = now => {
+            if (last) {
+                const delta = Math.min(0.2, (now - last) / 1000);
+                if (delta > 0) {
+                    current += delta;
+                    if (current >= total) current = 0;
+                    update(current);
+                }
+            }
+            last = now;
+            requestAnimationFrame(step);
+        };
+        requestAnimationFrame(step);
+    })();
+    </script>
 </body>
 </html>
